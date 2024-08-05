@@ -19,9 +19,6 @@ export const verifyAdmin = async (req,res,next) => {
     })
     
     const accessingUser = await User.findById(req.user.id)
-
-    console.log(accessingUser)
-
     if(!accessingUser.admin){
         return next(errorHandler(404,"page not found"))
     }
