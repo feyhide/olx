@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
+import productRouter from './routes/products.route.js';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(cookieParser())
 // Routes
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/products",productRouter)
 
 // Error handling middleware
 app.use((err, req, res, next) => {
