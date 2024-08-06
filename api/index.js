@@ -5,8 +5,21 @@ import userRouter from './routes/user.route.js';
 import authRouter from './routes/auth.route.js';
 import productRouter from './routes/products.route.js';
 import cookieParser from 'cookie-parser';
+import { Redis } from 'ioredis'
 
 dotenv.config();
+
+export const redis = new Redis({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD
+})
+
+
+redis.on("connect",()=>{
+    console.log("redis connected")
+})
+
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {

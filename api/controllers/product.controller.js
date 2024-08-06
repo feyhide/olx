@@ -1,3 +1,4 @@
+import { redis } from "../index.js"
 import Product from "../models/product.model.js"
 import { errorHandler } from "../utils/error.js"
 
@@ -13,10 +14,8 @@ export const addProduct = async (req,res,next) => {
 export const getProducts = async (req,res,next) => {
     try {
         const products = await Product.find()
-        res.status(200).json({
-            items:products.length,
-            products
-        })
+        await redis.setex("products",60,JSON.stringify(products))
+        res.status(200).json(products)
     } catch (error) {
         next(error)
     }
@@ -61,6 +60,14 @@ export const searchProducts = async (req, res, next) => {
         const sort = req.params.sort || "createdAt";
         const order = req.params.order || "desc";
 
+        const cacheKey = `search:${term}:${type}:${sort}:${order}:${limit}:${page}`;
+
+        const cachedResults = await redis.get(cacheKey);
+        if (cachedResults) {
+            console.log("cached")
+            return res.status(200).json(JSON.parse(cachedResults));
+        }
+
         const query = {
             title: { $regex: term, $options: 'i' }
         };
@@ -72,12 +79,12 @@ export const searchProducts = async (req, res, next) => {
         const products = await Product.find(query)
             .sort({ [sort]: order })
             .limit(limit)
-            .skip(page);
+            .skip(page * limit);
 
-        return res.status(200).json({
-            items: products.length,
-            products
-        });
+
+        await redis.setex(cacheKey, 15, JSON.stringify(products));
+
+        return res.status(200).json(products);
     } catch (error) {
         next(error);
     }

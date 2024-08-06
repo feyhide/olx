@@ -1,6 +1,22 @@
+import { redis } from "../index.js"
 import User from "../models/user.model.js"
 import { errorHandler } from "../utils/error.js"
 import bcryptjs from 'bcryptjs'
+
+
+export const getUser = async (req,res,next) => {
+    if(req.user.id !== req.params.id){
+        return next(errorHandler(401,"you can only see your own account"))
+    }
+    try {
+        const user = await User.findById(req.user.id)
+        const {password:pass,admin,...rest} = user._doc
+        await redis.setex(`profile:${req.user.id}`,60,JSON.stringify(rest))
+        res.status(200).json(rest)
+    } catch (error) {
+        next(error)
+    }
+}
 
 export const updateUser = async (req,res,next) => {
     if(req.user.id !== req.params.id){
@@ -77,11 +93,9 @@ export const getCartItems = async (req,res,next) => {
     try {
         let cartitems = await User.findById(req.user.id)
         cartitems = cartitems.cart
+        await redis.setex(`cart:${req.user.id}`,60,JSON.stringify(cartitems))
 
-        res.status(200).json({
-            items:cartitems.length,
-            cartitems
-        })
+        res.status(200).json(cartitems)
     } catch (error) {
         next(error)
     }
@@ -166,11 +180,10 @@ export const getOrderItems = async (req,res,next) => {
     try {
         let orderitems = await User.findById(req.user.id)
         orderitems = orderitems.order
-
-        res.status(200).json({
-            items:orderitems.length,
-            orderitems
-        })
+        
+        await redis.setex(`orders:${req.user.id}`,60,JSON.stringify(orderitems))
+        
+        res.status(200).json(orderitems)
     } catch (error) {
         next(error)
     }
@@ -187,9 +200,9 @@ export const getallorders = async (req, res, next) => {
             }))
         );
         
-        res.status(200).json({
-            orders: allOrders
-        });
+        await redis.setex("allOrders",60,JSON.stringify(allOrders))
+       
+        res.status(200).json(allOrders);
     } catch (error) {
         next(error);
     }

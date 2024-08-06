@@ -1,19 +1,20 @@
 import express from 'express'
-import { addOrder, addtoCart, deleteUser, getallorders, getCartItems, getOrderItems, removecartitems, updateOrderStatus, updateUser } from '../controllers/user.controller.js'
+import { addOrder, addtoCart, deleteUser, getallorders, getCartItems, getOrderItems, getUser, removecartitems, updateOrderStatus, updateUser } from '../controllers/user.controller.js'
 import { verifyToken } from '../utils/verifyToken.js'
 import { verifyAdmin } from '../utils/verifyAdmin.js'
+import { deleteCachedData, deleteCachedUser, getCachedData, getCachedUser } from '../utils/redis.js'
 
 const router = express.Router()
 
-
-router.post("/update/:id",verifyToken,updateUser)
-router.delete("/delete/:id",verifyToken,deleteUser)
-router.post("/addtocart/:id",verifyToken,addtoCart)
-router.get("/cart/:id",verifyToken,getCartItems)
-router.post("/addorder/:id",verifyToken,addOrder)
-router.delete("/removecartitem/:id",verifyToken,removecartitems)
-router.get("/orders/:id",verifyToken,getOrderItems)
-router.get("/getallorders",verifyAdmin,getallorders)
-router.post("/updateorderstatus",verifyAdmin,updateOrderStatus)
+router.get("/profile/:id",verifyToken,getCachedUser("profile"),getUser)
+router.post("/update/:id",verifyToken,deleteCachedUser("profile"),updateUser)
+router.delete("/delete/:id",verifyToken,deleteCachedUser("profile"),deleteUser)
+router.post("/addtocart/:id",verifyToken,deleteCachedUser("cart"),addtoCart)
+router.get("/cart/:id",verifyToken,getCachedUser("cart"),getCartItems)
+router.delete("/removecartitem/:id",verifyToken,deleteCachedUser("cart"),removecartitems)
+router.post("/addorder/:id",verifyToken,deleteCachedUser("orders"),addOrder)
+router.get("/orders/:id",verifyToken,getCachedUser("orders"),getOrderItems)
+router.get("/getallorders",verifyAdmin,getCachedData("allOrders"),getallorders)
+router.post("/updateorderstatus",verifyAdmin,deleteCachedData("allOrders"),updateOrderStatus)
 
 export default router
