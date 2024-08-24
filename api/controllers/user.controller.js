@@ -5,9 +5,6 @@ import bcryptjs from 'bcryptjs'
 
 
 export const getUser = async (req,res,next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only see your own account"))
-    }
     try {
         const user = await User.findById(req.user.id)
         const {password:pass,admin,...rest} = user._doc
@@ -19,9 +16,6 @@ export const getUser = async (req,res,next) => {
 }
 
 export const updateUser = async (req,res,next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only update your own account"))
-    }
     try {
         if(req.body.password){
             req.body.password = bcryptjs.hashSync(req.body.password, 10)
@@ -44,10 +38,6 @@ export const updateUser = async (req,res,next) => {
 }
 
 export const deleteUser = async (req,res,next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only delete your own account"))
-    }
-
     try {
         await User.findByIdAndDelete(req.params.id)
         res.status(200).json({
@@ -60,9 +50,6 @@ export const deleteUser = async (req,res,next) => {
 }
 
 export const addtoCart = async (req, res, next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only add cart of your own account"))
-    }
     try {
         const { productId, quantity } = req.body; 
         const user = await User.findById(req.user.id);
@@ -87,9 +74,6 @@ export const addtoCart = async (req, res, next) => {
 };
 
 export const getCartItems = async (req,res,next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only get your own account's cart"))
-    }
     try {
         let cartitems = await User.findById(req.user.id)
         cartitems = cartitems.cart
@@ -102,10 +86,6 @@ export const getCartItems = async (req,res,next) => {
 } 
 
 export const removecartitems = async (req, res, next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only remove your own account'cart items"))
-    }
-
     try {
         const { cartitemid } = req.body;
 
@@ -139,10 +119,6 @@ export const removecartitems = async (req, res, next) => {
 
 
 export const addOrder = async (req,res,next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only update your own account"))
-    }
-
     try {
         const { items, status } = req.body;
         
@@ -173,10 +149,6 @@ export const addOrder = async (req,res,next) => {
 } 
 
 export const getOrderItems = async (req,res,next) => {
-    if(req.user.id !== req.params.id){
-        return next(errorHandler(401,"you can only get your own account's order"))
-    }
-
     try {
         let orderitems = await User.findById(req.user.id)
         orderitems = orderitems.order
@@ -189,47 +161,4 @@ export const getOrderItems = async (req,res,next) => {
     }
 } 
 
-export const getallorders = async (req, res, next) => {
-    try {
-        const users = await User.find()
-        
-        const allOrders = users.flatMap(user => 
-            user.order.map(order => ({
-                ...order.toObject(),
-                userId: user._id
-            }))
-        );
-        
-        await redis.setex("allOrders",60,JSON.stringify(allOrders))
-       
-        res.status(200).json(allOrders);
-    } catch (error) {
-        next(error);
-    }
-};
 
-export const updateOrderStatus = async (req, res, next) => {
-    try {
-        const { status, orderid, userid } = req.body;
-        if (!status || !orderid || !userid) {
-            return res.status(400).json({ message: 'Status and order ID are required' });
-        }
-
-        const user = await User.findById(userid);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const order = user.order.id(orderid);
-        if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
-        }
-
-        order.status = status;
-        await user.save();
-
-        res.status(200).json({ message: 'Order status updated successfully', order });
-    } catch (error) {
-        next(error);
-    }
-};

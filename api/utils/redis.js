@@ -21,7 +21,7 @@ export const getCachedUser = (key) => async (req,res,next) => {
     next();
 }
 
-export const deleteCachedUser = () => async (req,res,next) => {
+export const deleteCachedUser = (key) => async (req,res,next) => {
     const cachedkey = `${key}:${req.user.id}`
     await redis.del(cachedkey)
     next();

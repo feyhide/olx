@@ -14,6 +14,10 @@ const productSchema = new mongoose.Schema({
         enum: ["shirt", "sweatshirt", "chain", "ring", "bracelet","watch","pants","eyewear","bag","belt"],
         required: true
     },
+    sizes:{
+        type:[Number],
+        required: true
+    },
     regularPrice:{
         type:Number,
         required:true
@@ -26,7 +30,7 @@ const productSchema = new mongoose.Schema({
         required:true
     },
     imageUrls:{
-        type:Array,
+        type:{String},
         required:true
     }
 },{timestamps:true})
