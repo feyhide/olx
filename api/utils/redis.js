@@ -4,6 +4,7 @@ export const getCachedData = (key) => async (req,res,next) => {
     let data = await redis.get(key)
     
     if(data){
+        console.log("cached")
         return res.json(JSON.parse(data))
     }
 
@@ -15,6 +16,7 @@ export const getCachedUser = (key) => async (req,res,next) => {
     let data = await redis.get(cachedkey)
     console.log(cachedkey)
     if(data){
+        console.log("cached")
         return res.json(JSON.parse(data))
     }
 

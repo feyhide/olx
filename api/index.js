@@ -22,7 +22,7 @@ redis.on("connect",()=>{
 })
 
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log("Connected to the database");
     })
