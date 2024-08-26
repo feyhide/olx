@@ -5,32 +5,32 @@ const productSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    description:{
-        type:String,
-        required:true
-    },
     type:{
         type:String,
-        enum: ["shirt", "sweatshirt", "chain", "ring", "bracelet","watch","pants","eyewear","bag","belt"],
         required: true
     },
-    sizes:{
-        type:[Number],
+    sex:{
+        type:String,
         required: true
     },
-    regularPrice:{
+    brand:{
+        type:String,
+        required: true
+    },
+    sizes: [{
+        country: { type: String, required: true },
+        size: { type: Number, required: true }
+    }],
+    price:{
         type:Number,
         required:true
     },
-    discountedPrice:{
-        type:Number,
-    },
-    quantity:{
+    stock:{
         type:Number,
         required:true
     },
-    imageUrls:{
-        type:{String},
+    imagesUrl:{
+        type:[String],
         required:true
     }
 },{timestamps:true})

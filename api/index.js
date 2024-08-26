@@ -35,6 +35,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cookieParser())
+app.use(express.urlencoded({extended:false}))
 
 // Routes
 app.use("/api/v1/user", userRouter);

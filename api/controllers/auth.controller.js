@@ -4,17 +4,21 @@ import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
 export const signup = async (req, res, next) => {
-    const { username, email, password } = req.body;
-    if (username === undefined || email === undefined || password === undefined) {
+    const {email, password } = req.body;
+    if (email === undefined || password === undefined) {
         return next(errorHandler(500, "Only completed form is accepted"));
     }
 
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
     try {
-        const newUser = new User({ username, email, password: hashedPassword });
+        const newUser = new User({ email, password: hashedPassword });
         await newUser.save();
-        res.status(201).json("User created successfully");
+
+        const token = jwt.sign({id:newUser._id},process.env.JWT_SECRET)
+        const {password:pass,admin, ...rest} = newUser._doc
+        res.cookie("access_token",token,{httpOnly:true}).status(200).json(rest)
+    
     } catch (error) {
         next(error);
     }
