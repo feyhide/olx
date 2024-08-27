@@ -13,7 +13,6 @@ const Sidebar = () => {
                 <div className='w-full flex flex-col gap-2 font-text text-lg font-semibold'>
                 <button onClick={()=>setpage("analytics")} className={classNames('w-full text-center bg-black text-white transition-all ease ',{"py-5": page === 'analytics',"py-2": page != 'analytics'})}>View Analytics</button>
                 <button onClick={()=>{setpage("products"),navigate("/admin/viewproducts")}} className={classNames('w-full text-center bg-black text-white transition-all ease',{"py-5": page === 'products',"py-2": page != 'products'})}>Handle Products</button>
-                <button onClick={()=>setpage("catagories")} className={classNames('w-full text-center bg-black text-white transition-all ease',{"py-5": page === 'catagories',"py-2": page != 'catagories'})}>Catagories</button>
                 <button onClick={()=>setpage("orders")} className={classNames('w-full text-center bg-black text-white transition-all ease',{"py-5": page === 'orders',"py-2": page != 'orders'})}>View Orders</button>
                 <button onClick={()=>setpage("msgs")} className={classNames('w-full text-center bg-black text-white transition-all ease',{"py-5": page === 'msgs',"py-2": page != 'msgs'})}>Messages</button>
                 </div>

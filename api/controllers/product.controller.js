@@ -53,39 +53,59 @@ export const updateProduct = async (req,res,next) => {
 
 export const searchProducts = async (req, res, next) => {
     try {
-        const limit = parseInt(req.params.limit) || 10;
-        const page = parseInt(req.params.page) || 0;
-        const type = req.body.type;
-        const term = req.params.term || "";
-        const sort = req.params.sort || "createdAt";
-        const order = req.params.order || "desc";
+        const limit = parseInt(req.query.limit, 10) || 10;
+        const page = parseInt(req.query.page, 10) || 0;
+        const type = req.query.type || "";
+        const sex = req.query.sex || "";
+        const brand = req.query.brand || "";
+        const title = req.query.title || "";
+        const sort = req.query.sort || "createdAt";
+        const order = req.query.order || "desc";
+        
+        const sizes = req.query.sizes ? req.query.sizes.split(',').map(size => parseFloat(size)) : [];
+        const countries = req.query.countries ? req.query.countries.split(',') : [];
 
-        const cacheKey = `search:${term}:${type}:${sort}:${order}:${limit}:${page}`;
+        const cacheKey = `search:${title}:${type}:${sex}:${brand}:${sizes.join('-')}:${countries.join('-')}:${sort}:${order}:${limit}:${page}`;
 
         const cachedResults = await redis.get(cacheKey);
         if (cachedResults) {
-            console.log("cached")
+            console.log("cached");
             return res.status(200).json(JSON.parse(cachedResults));
         }
 
-        const query = {
-            title: { $regex: term, $options: 'i' }
-        };
-
+        const query = {};
+        if (title) {
+            query.title = { $regex: title, $options: 'i' };
+        }
         if (type) {
             query.type = type;
         }
+        if (sex) {
+            query.sex = sex;
+        }
+        if (brand) {
+            query.brand = brand;
+        }
+        if (sizes.length > 0) {
+            query['sizes.size'] = { $in: sizes };
+        }
+        if (countries.length > 0) {
+            query['sizes.country'] = { $in: countries };
+        }
+
+        const total = await Product.countDocuments(query);
 
         const products = await Product.find(query)
             .sort({ [sort]: order })
             .limit(limit)
             .skip(page * limit);
 
+        const response = { total, products };
 
-        await redis.setex(cacheKey, 15, JSON.stringify(products));
+        await redis.setex(cacheKey, 15, JSON.stringify(response));
 
-        return res.status(200).json(products);
+        return res.status(200).json(response);
     } catch (error) {
         next(error);
     }
-}
+};

@@ -23,7 +23,7 @@ const App = () => {
           <Route element={<AdminLayout />}>
             <Route path='/admin/viewproducts' element={<ViewProducts />} />
             <Route path='/admin/createproducts' element={<CreateProduct />} />
-
+            
           </Route>
         </Route>
       </Routes>
