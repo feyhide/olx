@@ -1,32 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MdEdit } from "react-icons/md";
+import { MdEdit } from 'react-icons/md';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const ViewProducts = () => {
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
   const [query, setQuery] = useState({
     brand: '',
     sex: '',
     type: '',
-    page: 0
+    page
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page) => {
     setLoading(true);
     try {
-      const queryParams = new URLSearchParams(query).toString();
+      const newQuery = { ...query, page };
+      const queryParams = new URLSearchParams(newQuery).toString();
+      console.log(queryParams);
       const res = await fetch(`/api/v1/products/search?${queryParams}`);
       const data = await res.json();
       if (data.success === false) {
         setError('Failed to fetch products');
         return;
       }
-      setTotal(data.total)
-      setProducts(data.products || []);
+      setTotal(data.total);
+      setProducts(prevProducts => [...prevProducts, ...data.products]);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -34,14 +38,27 @@ const ViewProducts = () => {
     }
   };
 
+  const fetchMoreProducts = () => {
+    if (!loading) {
+      setPage(prevPage => {
+        const nextPage = prevPage + 1;
+        fetchProducts(nextPage);
+        return nextPage;
+      });
+    }
+  };
+
   useEffect(() => {
-    fetchProducts();
+    setPage(0);
+    setProducts([]);
+    fetchProducts(0);
   }, [query]);
 
   const handleFilterChange = (e) => {
     setQuery({
       ...query,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
+      page: 0
     });
   };
 
@@ -50,7 +67,7 @@ const ViewProducts = () => {
       <div className='flex justify-between gap-2 p-2 mt-10 px-10 w-full font-main'>
         <p className='text-5xl'>View Products</p>
         <button
-          onClick={() => navigate("/admin/createproducts")}
+          onClick={() => navigate('/admin/createproducts')}
           className='text-3xl bg-green-500 text-white p-2 rounded-xl'
         >
           Create Product
@@ -107,24 +124,31 @@ const ViewProducts = () => {
       </div>
       <div className='w-full relative'>
         <p className='text-3xl font-main w-full text-center'>Total Results : {total}</p>
-        <div className='w-full p-10 flex items-center justify-center'>
-          <div className='w-auto grid grid-cols-4 gap-5'>
-            {products && products.map((product,index)=>(
-              <div className='relative hover:scale-105 hover:z-30 transition-all duration-300 ease-in-out w-[250px] min-h-[300px] rounded-xl overflow-hidden flex flex-col hover:bg-gray-100 bg-white items-start'>
-                <MdEdit onClick={()=>navigate(`/admin/updateproduct/${product._id}`)} className='absolute top-5 right-5 '/>
-                <img src={product.imagesUrl[0]} className='  object-scale-down'/>
-                <div className='flex w-full h-full flex-col items-center justify-center gap-1 p-2 text-lg font-text font-semibold tracking-tighter'>
-                  <p className='text-wrap text-center'>{product.title}</p>
-                  <p>$ {product.price}</p>
-                  <div className='flex flex-col items-center justify-center font-normal text-sm capitalize'>
-                    <p>- {product.brand}</p>
-                    <p>- {product.sex}</p>
-                    <p>- {product.type}</p>
+        <div className='w-full overflow-hidden p-10 flex items-center justify-center'>
+          <InfiniteScroll
+            dataLength={products.length}
+            next={fetchMoreProducts}
+            hasMore={products.length < total}
+            className='w-full'
+          >
+            <div className='w-auto grid grid-cols-4 gap-5'>
+                {products.map((product, index) => (
+                  <div key={index} className='relative hover:scale-105 hover:z-30 transition-all duration-300 ease-in-out w-[250px] min-h-[300px] rounded-xl overflow-hidden flex flex-col hover:bg-gray-100 bg-white items-start'>
+                    <MdEdit onClick={() => navigate(`/admin/updateproduct/${product._id}`)} className='absolute top-5 right-5' />
+                    <img src={product.imagesUrl[0]} alt={product.title} className='object-scale-down' />
+                    <div className='flex w-full h-full flex-col items-center justify-center gap-1 p-2 text-lg font-text font-semibold tracking-tighter'>
+                      <p className='text-wrap text-center'>{product.title}</p>
+                      <p>$ {product.price}</p>
+                      <div className='flex flex-col items-center justify-center font-normal text-sm capitalize'>
+                        <p>- {product.brand}</p>
+                        <p>- {product.sex}</p>
+                        <p>- {product.type}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                ))}
+            </div>
+          </InfiniteScroll>
         </div>
       </div>
     </div>
