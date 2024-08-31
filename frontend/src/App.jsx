@@ -7,6 +7,7 @@ import PrivateRoute from './components/utils/PrivateRoute';
 import AdminRoute from './components/utils/AdminRoute';
 import ViewProducts from './components/dashboardcomponents/ViewProducts';
 import CreateProduct from './components/dashboardcomponents/CreateProduct';
+import UpdateProduct from './components/dashboardcomponents/UpdateProduct';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route element={<AdminLayout />}>
             <Route path='/admin/viewproducts' element={<ViewProducts />} />
             <Route path='/admin/createproducts' element={<CreateProduct />} />
+            <Route path='/admin/updateproduct/:productid' element={<UpdateProduct />} />
             
           </Route>
         </Route>

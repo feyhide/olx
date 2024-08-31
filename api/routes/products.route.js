@@ -1,5 +1,5 @@
 import express from 'express'
-import { addProduct, deleteProduct, getProducts, searchProducts, updateProduct } from '../controllers/product.controller.js'
+import { addProduct, deleteProduct, getProduct, getProducts, searchProducts, updateProduct } from '../controllers/product.controller.js'
 import { verifyAdmin } from '../utils/verifyAdmin.js'
 import { deleteCachedData, getCachedData } from '../utils/redis.js'
 import { addcatagory, deletecatagory, getcatagories, updatecatagory } from '../controllers/catagories.controller.js'
@@ -8,6 +8,7 @@ const router = express.Router()
 
 router.post("/addproduct",verifyAdmin,deleteCachedData("products"),addProduct)
 router.get("/getproducts",getCachedData("products"),getProducts)
+router.get("/getproduct/:id",getCachedData("product"),getProduct)
 router.delete("/deleteproduct/:id",verifyAdmin,deleteCachedData("products"),deleteProduct)
 router.patch("/updateproduct/:id",verifyAdmin,deleteCachedData("products"),updateProduct)
 

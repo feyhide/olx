@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { IoAdd, IoClose, IoCloseCircle, IoTrash } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const UpdateProduct = () => {
+    const params = useParams()
     const { currentUser } = useSelector(state => state.user);
     const [hoverIndex, setHoverIndex] = useState(null);
     const navigate = useNavigate();
@@ -16,8 +17,8 @@ const UpdateProduct = () => {
     const [formdata, setFormdata] = useState({
         imagesUrl: [],
         title: '',
-        price: 0,
-        stock: 0,
+        price: "",
+        stock: "",
         brand: '',
         sex: '',
         type: '',
@@ -44,7 +45,7 @@ const UpdateProduct = () => {
     const submitForm = async (e) => {
         setloading(true)
         e.preventDefault();
-
+        setError(null)
         try {
             if (images.length < 1) {
                 setError("You must upload at least one image");
@@ -69,6 +70,24 @@ const UpdateProduct = () => {
             });
 
             const data = await res.json();
+            if(data.success === false){
+                setError(data.message)
+                return
+            }
+            setFormdata({
+                imagesUrl: [],
+                title: '',
+                price: "",
+                stock: "",
+                brand: '',
+                sex: '',
+                type: '',
+                sizes: [],
+            });
+            setImages([]);
+            setSizes([]);
+            setCountry('');
+            setSize('');
             console.log("Product added successfully", data);
             setloading(false)
         } catch (error) {
@@ -116,15 +135,39 @@ const UpdateProduct = () => {
         [images]
     );
 
+
+    const fetchProduct = async () => {
+        try {
+            
+            const res = await fetch(`/api/v1/products/getproduct/${params.productid}`);
+            const data = await res.json();
+            if (data.success === false) {
+                setError(data.message);
+                return;
+            }
+            setFormdata(data);
+            setSizes(data.sizes);
+            //setImages(data.imagesUrl)
+        } catch (error) {
+            setError(error.message);
+        }
+    };
+
+
+
+    useEffect(()=>{
+        fetchProduct()
+    },[])
+
     return (
         <>
         <div className='absolute right-0 top-0 flex flex-col w-[75vw]'>
             {loading && (
-                <div className='flex items-center justify-center absolute top-0 w-full z-50 h-full bg-opacity-20 backdrop-blur-sm bg-white'>
-                    <div className='w-1/2 h-1/3 flex items-center relative justify-center font-text font-semibold text-2xl bg-white rounded-lg'>
-                        {!error ? (<p>Creating Product...</p>):
-                        (<p>{error}</p>)}
-                        { error && (<button className='w-[40px] h-[40px] absolute top-10 left-10 text-white flex items-center justify-center bg-red-600'>
+                <div className='flex items-center justify-center absolute top-0 w-full z-50 h-full bg-opacity-20 backdrop-blur-sm bg-black'>
+                    <div className='w-1/2 flex items-center relative justify-center  bg-white'>
+                        {!error ? (<p className=' p-10 font-text font-semibold text-2xl'>Creating Product...</p>):
+                        (<p className='font-text font-semibold text-lg text-wrap p-10'>{error}</p>)}
+                        { error && (<button onClick={()=>setloading(false)} className='w-[40px] h-[40px] absolute -top-10 left-0 text-white flex items-center justify-center bg-red-600'>
                             <IoClose className="w-full h-[70%]"/>
                         </button>)}
                     </div>
@@ -139,10 +182,11 @@ const UpdateProduct = () => {
                     View Products
                 </button>
             </div>
-            <form onSubmit={submitForm} className='w-full flex h-[80vh]'>
+            <form onSubmit={submitForm} className='w-full mt-10 flex h-[90vh]'>
                 <div className='relative w-1/2 flex gap-2 font-text justify-center px-10 flex-col h-full bg-white'>
                     <button type='submit' className='absolute top-20 right-0 mr-10 text-2xl bg-green-400 text-white p-2 px-4'>Create</button>
                     <input 
+                        value={formdata.title}
                         id="title"
                         onChange={handleFormChange}
                         type='text' 
@@ -151,13 +195,15 @@ const UpdateProduct = () => {
                         />
                     <div className='flex flex-col'>
                         <input 
+                            value={formdata.brand}
                             type='text'
                             id="brand"
                             onChange={handleFormChange}
                             placeholder='Brand' 
                             className='text-2xl text-wrap w-full text-end font-main'
-                            />
+                        />
                         <input 
+                            value={formdata.type}
                             type='text'
                             id="type"
                             onChange={handleFormChange}
@@ -165,6 +211,7 @@ const UpdateProduct = () => {
                             className='text-2xl text-wrap w-full text-end font-main'
                             />
                         <input 
+                            value={formdata.sex}
                             id="sex"
                             onChange={handleFormChange}
                             type='text' 
@@ -172,6 +219,7 @@ const UpdateProduct = () => {
                             className='text-2xl text-wrap w-full text-end font-main'
                             />
                         <input 
+                            value={formdata.stock}
                             id="stock"
                             onChange={handleFormChange}
                             type='number' 
@@ -180,7 +228,8 @@ const UpdateProduct = () => {
                             />
                     </div>
                     <input 
-                        step="0.01" 
+                        step="0.01"
+                        value={formdata.price} 
                         type='number'
                         id="price"
                         onChange={handleFormChange}
@@ -249,9 +298,22 @@ const UpdateProduct = () => {
                         )}
                     </div>
                     {images.length > 0 && (
-                        <div className='flex gap-2 h-full relative w-[30%] justify-start'>
+                        <div className='flex gap-2 h-auto relative w-[30%] justify-start'>
                             <div className='gap-2 grid grid-cols-1'>
-                                
+                                {images.length < 6 && (
+                                    <div className='w-[100px] h-[100px]'>
+                                        <input 
+                                            onChange={handleFileChange} 
+                                            multiple
+                                            type='file'
+                                            id="fileInput"
+                                            className='w-full h-full hidden'
+                                        />
+                                        <label htmlFor='fileInput' className="w-full h-full flex items-center justify-center bg-green-400">
+                                            <IoAdd className='w-1/2 h-1/2 text-white'/>
+                                        </label>
+                                    </div>
+                                )}
                                 {images.map((file, index) => (
                                     <div 
                                     key={index} 
@@ -270,20 +332,7 @@ const UpdateProduct = () => {
                                             />
                                     </div>
                                 ))}
-                                {images.length < 6 && (
-                                    <div className='w-[100px] h-[100px]'>
-                                        <input 
-                                            onChange={handleFileChange} 
-                                            multiple
-                                            type='file'
-                                            id="fileInput"
-                                            className='w-full h-full hidden'
-                                        />
-                                        <label htmlFor='fileInput' className="w-full h-full flex items-center justify-center bg-green-400">
-                                            <IoAdd className='w-1/2 h-1/2 text-white'/>
-                                        </label>
-                                    </div>
-                                )}
+                                
                             </div>
                         </div>
                     )}

@@ -21,6 +21,16 @@ export const getProducts = async (req,res,next) => {
     }
 }
 
+export const getProduct = async (req,res,next) => {
+    try {
+        const product = await Product.findById(req.params.id)
+        await redis.setex("product",60,JSON.stringify(product))
+        res.status(200).json(product)
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const deleteProduct = async (req,res,next) => {
     try {
         const products = await Product.findByIdAndDelete(req.params.id)
