@@ -23,8 +23,13 @@ export const getProducts = async (req,res,next) => {
 
 export const getProduct = async (req,res,next) => {
     try {
+        const cachedResults = await redis.get(`product/${req.params.id}`);
+        if (cachedResults) {
+            console.log("cached");
+            return res.status(200).json(JSON.parse(cachedResults));
+        }
         const product = await Product.findById(req.params.id)
-        await redis.setex("product",60,JSON.stringify(product))
+        await redis.setex(`product/${req.params.id}`,60,JSON.stringify(product))
         res.status(200).json(product)
     } catch (error) {
         next(error)

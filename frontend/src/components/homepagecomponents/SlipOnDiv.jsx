@@ -58,24 +58,24 @@ const SlipOnDiv = () => {
     return (
     <div className='w-[100vw] relative pt-10 min-h-[100vh] flex flex-col items-center justify-center bg-white'>
           <p className='text-7xl font-main'>Explore Slip-Ons</p>
-          {menproducts.length > 1 && <div onClick={()=>goto("men")} className='w-full min-h-[40vh] flex flex-col relative items-center justify-center gap-4 py-5'>
-            <p className='text-3xl font-text tracking-tighter'>For Men</p>
+          {menproducts.length > 1 && <div className='w-full min-h-[40vh] flex flex-col relative items-center justify-center gap-4 py-5'>
+            <p onClick={()=>goto("men")} className='text-3xl font-text tracking-tighter'>For Men</p>
             <div className='w-full h-full gap-5 flex items-center justify-center'>
                 {menproducts && menproducts.map((product,index)=>(
                     <ProductBox product={product} key={index}/>
                 ))}
             </div>
           </div>}
-          {womenproducts.length > 1 && <div onClick={()=>goto("women")} className='w-full min-h-[40vh] flex flex-col items-center justify-center gap-4 py-5'>
-            <p className='text-3xl font-text tracking-tighter'>For Women</p>
+          {womenproducts.length > 1 && <div  className='w-full min-h-[40vh] flex flex-col items-center justify-center gap-4 py-5'>
+            <p onClick={()=>goto("women")} className='text-3xl font-text tracking-tighter'>For Women</p>
             <div className='w-full h-full gap-5 flex items-center justify-center'>
                 {womenproducts && womenproducts.map((product,index)=>(
                     <ProductBox product={product} key={index}/>
                 ))}
             </div>
           </div>}
-          {kidsproducts.length > 1 && <div onClick={()=>goto("kids")} className='w-full min-h-[40vh] flex flex-col items-center justify-center gap-4 py-5'>
-            <p className='text-3xl font-text tracking-tighter'>For Kids</p>
+          {kidsproducts.length > 1 && <div  className='w-full min-h-[40vh] flex flex-col items-center justify-center gap-4 py-5'>
+            <p onClick={()=>goto("kids")} className='text-3xl font-text tracking-tighter'>For Kids</p>
             <div className='w-full h-full gap-5 flex items-center justify-center'>
                 {kidsproducts && kidsproducts.map((product,index)=>(
                     <ProductBox product={product} key={index}/>

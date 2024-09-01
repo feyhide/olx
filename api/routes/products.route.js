@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.post("/addproduct",verifyAdmin,deleteCachedData("products"),addProduct)
 router.get("/getproducts",getCachedData("products"),getProducts)
-router.get("/getproduct/:id",getCachedData("product"),getProduct)
+router.get("/getproduct/:id",getProduct)
 router.delete("/deleteproduct/:id",verifyAdmin,deleteCachedData("products"),deleteProduct)
 router.patch("/updateproduct/:id",verifyAdmin,deleteCachedData("products"),updateProduct)
 

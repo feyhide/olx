@@ -1,8 +1,10 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ProductBox = ({product}) => {
-  return (
-        <div
+    const navigate = useNavigate()
+    return (
+        <div onClick={()=>{navigate(`/product/${product._id}`)}}
             className="relative transform transition-transform duration-300 ease-in-out hover:scale-105 hover:z-30 w-[250px] h-[400px] rounded-xl overflow-hidden flex flex-col bg-white shadow-lg hover:shadow-xl"
         >
             <div className='w-full h-2/3 overflow-hidden'>

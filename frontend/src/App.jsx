@@ -9,6 +9,7 @@ import ViewProducts from './components/dashboardcomponents/ViewProducts';
 import CreateProduct from './components/dashboardcomponents/CreateProduct';
 import UpdateProduct from './components/dashboardcomponents/UpdateProduct';
 import Search from './components/pages/Search';
+import ProductPage from './components/pages/ProductPage';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route element={<MainLayout />}>
           <Route path='/' element={<Home />} />
           <Route path='/search' element={<Search />} />
+          <Route path='/product/:productid' element={<ProductPage />} />
           <Route element={<PrivateRoute />}>
           
           </Route>
