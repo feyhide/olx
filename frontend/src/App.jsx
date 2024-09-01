@@ -8,6 +8,7 @@ import AdminRoute from './components/utils/AdminRoute';
 import ViewProducts from './components/dashboardcomponents/ViewProducts';
 import CreateProduct from './components/dashboardcomponents/CreateProduct';
 import UpdateProduct from './components/dashboardcomponents/UpdateProduct';
+import Search from './components/pages/Search';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path='/' element={<Home />} />
+          <Route path='/search' element={<Search />} />
           <Route element={<PrivateRoute />}>
           
           </Route>

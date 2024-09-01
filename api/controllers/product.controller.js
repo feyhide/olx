@@ -63,8 +63,8 @@ export const updateProduct = async (req,res,next) => {
 
 export const searchProducts = async (req, res, next) => {
     try {
-        const limit = parseInt(req.query.limit, 10) || 12;
-        const page = parseInt(req.query.page, 10) || 0;
+        const limit = parseInt(req.query.limit) || 12;
+        const page = parseInt(req.query.page) || 0;
         const type = req.query.type || "";
         const sex = req.query.sex || "";
         const brand = req.query.brand || "";

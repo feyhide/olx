@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MdEdit } from 'react-icons/md';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import AdminProductBox from '../utils/AdminProductBox';
 
 const ViewProducts = () => {
   const [error, setError] = useState(null);
@@ -122,30 +123,18 @@ const ViewProducts = () => {
           </div>
         </div>
       </div>
-      <div className='w-full relative'>
+      <div className='w-full flex flex-col relative'>
         <p className='text-3xl font-main w-full text-center'>Total Results : {total}</p>
-        <div className='w-full overflow-hidden p-10 flex items-center justify-center'>
+        <div className='w-full flex items-center justify-center py-10 overflow-hidden'>
           <InfiniteScroll
             dataLength={products.length}
             next={fetchMoreProducts}
             hasMore={products.length < total}
-            className='w-full'
+            className='w-full p-2'
           >
-            <div className='w-auto grid grid-cols-4 gap-5'>
+            <div className='w-full grid grid-cols-4 gap-4'>
                 {products.map((product, index) => (
-                  <div key={index} className='relative hover:scale-105 hover:z-30 transition-all duration-300 ease-in-out w-[250px] min-h-[300px] rounded-xl overflow-hidden flex flex-col hover:bg-gray-100 bg-white items-start'>
-                    <MdEdit onClick={() => navigate(`/admin/updateproduct/${product._id}`)} className='absolute top-5 right-5' />
-                    <img src={product.imagesUrl[0]} alt={product.title} className='object-scale-down' />
-                    <div className='flex w-full h-full flex-col items-center justify-center gap-1 p-2 text-lg font-text font-semibold tracking-tighter'>
-                      <p className='text-wrap text-center'>{product.title}</p>
-                      <p>$ {product.price}</p>
-                      <div className='flex flex-col items-center justify-center font-normal text-sm capitalize'>
-                        <p>- {product.brand}</p>
-                        <p>- {product.sex}</p>
-                        <p>- {product.type}</p>
-                      </div>
-                    </div>
-                  </div>
+                  <AdminProductBox product={product} key={index}/>
                 ))}
             </div>
           </InfiniteScroll>
