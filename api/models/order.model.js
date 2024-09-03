@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { productSchema } from "./product.model.js";
 
 const OrderSchema = new mongoose.Schema({
     userRef: {
@@ -7,16 +8,12 @@ const OrderSchema = new mongoose.Schema({
         required: true
     },
     items : [{
-        productRef: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
-        },
+        product: productSchema,
         quantity: {
             type: Number,
             default: 1,
             min: 1 
-        }
+        },
     }],
     trackingId:{
         type:String
@@ -25,7 +22,11 @@ const OrderSchema = new mongoose.Schema({
         type:String,
         enum: ["pending","dispatch","in process","delivered"],
         default: "pending"
-    } 
+    },
+    totalPrice:{
+        type:Number,
+        required:true
+    }
     
 }, { timestamps: true });
 

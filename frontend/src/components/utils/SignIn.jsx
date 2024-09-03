@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signinFailure, signinStart, signinSuccess } from '../../redux/user/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { IoClose } from "react-icons/io5";
+import { addUsertoCart } from '../../redux/cart/cartSlice';
 
 const SignIn = ({ setSignup,setSignin }) => {
   const dispatch = useDispatch();
@@ -34,6 +35,8 @@ const SignIn = ({ setSignup,setSignin }) => {
         return;
       }
       dispatch(signinSuccess(data));
+      dispatch(addUsertoCart(data._id))
+      console.log(data._id)
       navigate('/');
       setSignin(false); 
     } catch (error) {

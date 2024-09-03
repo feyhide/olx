@@ -40,6 +40,7 @@ const customTheme = (theme) => ({
 });
 
 const Search = () => {
+    const location = useLocation();
     const [page, setPage] = useState(0);
     const [error, setError] = useState(null);
     const [products, setProducts] = useState([]);
@@ -53,7 +54,6 @@ const Search = () => {
     });
     const [loading, setLoading] = useState(false);
 
-    const location = useLocation();
     const navigate = useNavigate();
 
     const fetchMoreProducts = () => {
@@ -119,12 +119,12 @@ const Search = () => {
         }
     };
     
-    useEffect(()=>{
-        setPage(0);
-        setProducts([]);
-        fetchProducts(0)
-        setnewlocation(false)
-    },[newlocation === true])
+    // useEffect(()=>{
+    //     setPage(0);
+    //     setProducts([]);
+    //     fetchProducts(0)
+    //     setnewlocation(false)
+    // },[newlocation === true])
 
     useEffect(() => {
         console.log(location.search,"location")

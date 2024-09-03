@@ -142,7 +142,7 @@ const Header = () => {
         </div>
       )}
       {cart && (
-        <Cart setcart={setcart}/>
+        <Cart setCart={setcart}/>
       )}
     </>
   );
