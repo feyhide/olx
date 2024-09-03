@@ -9,6 +9,7 @@ import Categories from '../../../../api/models/catagories.model';
 import Cart from './Cart';
 import { reset } from '../../redux/cart/cartSlice';
 import { signOutFailure, signOutUserStart, signOutUserSuccess } from '../../redux/user/userSlice';
+import { MdAdminPanelSettings, MdDashboard, MdDashboardCustomize, MdSpaceDashboard } from 'react-icons/md';
 
 const Header = () => {
   const { currentUser } = useSelector(state => state.user);
@@ -40,6 +41,8 @@ const Header = () => {
   };
 
   useEffect(() => {
+    setcart(false)
+    setprofilemenu(false)
     switch (activeItem) {
       case 'men':
         setActiveDetails(mendetails);
@@ -89,9 +92,9 @@ const Header = () => {
         console.log(data.message)
         return;
       }
+      navigate("/")
       dispatch(reset());
       dispatch(signOutUserSuccess())
-      navigate("/")
     } catch (error) {
       dispatch(signOutFailure(error.message))
       console.log(error.message)
@@ -100,7 +103,7 @@ const Header = () => {
 
   return (
     <>
-      <div onMouseLeave={()=>setActiveItem(null)} className='w-full h-auto z-50 fixed flex flex-col'>
+      <div onMouseLeave={()=>setActiveItem(null)} className='w-full shadow-md h-auto z-50 fixed flex flex-col'>
         <div className="w-full h-[10vh] bg-white flex overflow-hidden items-center justify-between px-20">
           <img src='/logo.png' alt='Logo' className='w-[10%] h-full object-cover' />
           <div className='flex font-main text-2xl w-auto h-full gap-5 items-center justify-center'>
@@ -123,35 +126,15 @@ const Header = () => {
               Kids
             </p>
           </div>
-          <div className='flex w-[10%] gap-5 items-center justify-center'>
+          <div className='flex w-[10%] gap-3 items-center justify-center'>
             <CiSearch className='w-8 h-full' />
             <IoCartOutline onClick={() => {setcart(!cart),setprofilemenu(false)}}  className='w-8 h-full' />
             {!currentUser && <CiUser onClick={() => setSignup(true)} className="w-8 h-full" />}
             {currentUser && currentUser.avatar && <img onClick={()=>{setcart(false),setprofilemenu(!profilemenu)}} src={currentUser.avatar} className='w-8 rounded-full h-full'/>}
             {currentUser && !currentUser.avatar && <CiUser onClick={()=>{setcart(false),setprofilemenu(!profilemenu)}} className='w-8 h-full'/>}
+            {currentUser && currentUser.email === "superadmin@admin.com" && <MdSpaceDashboard onClick={()=>navigate("/admin/viewproducts")} className='w-8 h-full'/>}
           </div>
         </div>
-        {currentUser && profilemenu && (
-          <div className='w-full relative h-[30vh]'>
-            <div className='w-[20%] flex flex-col items-center justify-center h-full absolute top-2 right-5 rounded-xl bg-white'>
-              <IoClose onClick={()=>setprofilemenu(false)} className='text-red-600 absolute top-5 right-5 w-10 h-10'/>
-              <div className='w-full h-[70%] flex flex-col items-center justify-center'>
-                {!currentUser.avatar ? <CiUser className='w-12 h-1/2'/> : <img src={currentUser.avatar} className='w-12 h-1/2 rounded-full'/>}
-                <p className='font-text tracking-tighter font-semibold text-xl'>{currentUser.email}</p>
-              </div>
-              <div className='w-full h-[30%] flex p-2 gap-2 justify-between'>
-                <div onClick={handleSignout} className='w-1/2 h-full rounded-xl gap-2 flex items-center justify-center text-white text-lg font-text tracking-tighter bg-red-600'>
-                  <IoExit className='w-8 rotate-180 h-full text-white'/>
-                  <p>Sign Out</p>
-                </div>
-                <div className='w-1/2 gap-2 h-full rounded-xl flex items-center justify-center text-white text-lg font-text tracking-tighter bg-blue-600'>
-                  <p>Profile</p>
-                  <IoExit className='w-8 h-full text-white'/>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         {activeDetails && (
           <div onMouseEnter={()=>setisdetailActive(true)} onMouseLeave={()=>setisdetailActive(false)} className='w-full font-main relative min-h-[20vh] gap-20 flex items-center justify-center bg-white'>
             <div className='flex flex-col gap-2 p-5 text-center'>
@@ -187,6 +170,27 @@ const Header = () => {
           </div>
         </div>
       )}
+      {currentUser && profilemenu && (
+          <div className='w-full z-30 fixed top-20 h-[30vh]'>
+            <div className='w-[20%] flex flex-col shadow-lg p-2 items-center justify-center h-full absolute top-2 right-5 rounded-xl bg-white'>
+              <IoClose onClick={()=>setprofilemenu(false)} className='text-red-600 absolute top-5 right-5 w-10 h-10'/>
+              <div className='w-full h-[70%] flex flex-col items-center justify-center'>
+                {!currentUser.avatar ? <CiUser className='w-12 h-1/2'/> : <img src={currentUser.avatar} className='w-12 h-1/2 rounded-full'/>}
+                <p className='font-text tracking-tighter font-semibold text-xl'>{currentUser.email}</p>
+              </div>
+              <div className='w-full h-[30%] flex p-2 gap-2 justify-between'>
+                <div onClick={handleSignout} className='w-1/2 h-full rounded-xl gap-2 flex items-center justify-center text-white text-lg font-text tracking-tighter bg-red-600'>
+                  <IoExit className='w-8 rotate-180 h-full text-white'/>
+                  <p>Sign Out</p>
+                </div>
+                <div onClick={()=>{navigate(`/profile/${currentUser._id}`),setprofilemenu(false)}} className='w-1/2 gap-2 h-full rounded-xl flex items-center justify-center text-white text-lg font-text tracking-tighter bg-blue-600'>
+                  <p>Profile</p>
+                  <IoExit className='w-8 h-full text-white'/>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       {cart && (
         <Cart setCart={setcart}/>
       )}
