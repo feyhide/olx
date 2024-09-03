@@ -10,6 +10,8 @@ import CreateProduct from './components/dashboardcomponents/CreateProduct';
 import UpdateProduct from './components/dashboardcomponents/UpdateProduct';
 import Search from './components/pages/Search';
 import ProductPage from './components/pages/ProductPage';
+import OrderPlaced from './components/pages/OrderPlaced';
+import Profile from './components/pages/Profile';
 
 const App = () => {
   return (
@@ -19,7 +21,9 @@ const App = () => {
           <Route path='/' element={<Home />} />
           <Route path='/search' element={<Search />} />
           <Route path='/product/:productid' element={<ProductPage />} />
+          <Route path='/orderplaced' element={<OrderPlaced />} />
           <Route element={<PrivateRoute />}>
+            <Route path='/profile/:profileid' element={<Profile />} />
           
           </Route>
         </Route>

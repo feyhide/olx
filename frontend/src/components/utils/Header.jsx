@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { CiSearch, CiUser } from 'react-icons/ci';
-import { IoCartOutline, IoClose } from 'react-icons/io5';
-import { useSelector } from 'react-redux';
+import { IoArrowBack, IoCartOutline, IoClose, IoExit } from 'react-icons/io5';
+import { useDispatch, useSelector } from 'react-redux';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import { useNavigate } from 'react-router-dom';
 import Categories from '../../../../api/models/catagories.model';
 import Cart from './Cart';
+import { reset } from '../../redux/cart/cartSlice';
+import { signOutFailure, signOutUserStart, signOutUserSuccess } from '../../redux/user/userSlice';
 
 const Header = () => {
   const { currentUser } = useSelector(state => state.user);
+  const dispatch = useDispatch()
   const [signup, setSignup] = useState(false);
   const [signin, setSignin] = useState(false);
+  const [profilemenu, setprofilemenu] = useState(false);
   const [cart, setcart] = useState(false);
   const [activeItem, setActiveItem] = useState(null);
   const [isdetailActive,setisdetailActive] = useState(false);
@@ -75,6 +79,25 @@ const Header = () => {
     navigate(`/search?${searchQuery}`)
   }
 
+  const handleSignout = async () => {
+    try {
+      dispatch(signOutUserStart())
+      const res = await fetch(`/api/v1/auth/signout`)
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(signOutFailure(data.message))
+        console.log(data.message)
+        return;
+      }
+      dispatch(reset());
+      dispatch(signOutUserSuccess())
+      navigate("/")
+    } catch (error) {
+      dispatch(signOutFailure(error.message))
+      console.log(error.message)
+    }
+  }
+
   return (
     <>
       <div onMouseLeave={()=>setActiveItem(null)} className='w-full h-auto z-50 fixed flex flex-col'>
@@ -102,10 +125,33 @@ const Header = () => {
           </div>
           <div className='flex w-[10%] gap-5 items-center justify-center'>
             <CiSearch className='w-8 h-full' />
-            <IoCartOutline onClick={() => setcart(true)}  className='w-8 h-full' />
+            <IoCartOutline onClick={() => {setcart(!cart),setprofilemenu(false)}}  className='w-8 h-full' />
             {!currentUser && <CiUser onClick={() => setSignup(true)} className="w-8 h-full" />}
+            {currentUser && currentUser.avatar && <img onClick={()=>{setcart(false),setprofilemenu(!profilemenu)}} src={currentUser.avatar} className='w-8 rounded-full h-full'/>}
+            {currentUser && !currentUser.avatar && <CiUser onClick={()=>{setcart(false),setprofilemenu(!profilemenu)}} className='w-8 h-full'/>}
           </div>
         </div>
+        {currentUser && profilemenu && (
+          <div className='w-full relative h-[30vh]'>
+            <div className='w-[20%] flex flex-col items-center justify-center h-full absolute top-2 right-5 rounded-xl bg-white'>
+              <IoClose onClick={()=>setprofilemenu(false)} className='text-red-600 absolute top-5 right-5 w-10 h-10'/>
+              <div className='w-full h-[70%] flex flex-col items-center justify-center'>
+                {!currentUser.avatar ? <CiUser className='w-12 h-1/2'/> : <img src={currentUser.avatar} className='w-12 h-1/2 rounded-full'/>}
+                <p className='font-text tracking-tighter font-semibold text-xl'>{currentUser.email}</p>
+              </div>
+              <div className='w-full h-[30%] flex p-2 gap-2 justify-between'>
+                <div onClick={handleSignout} className='w-1/2 h-full rounded-xl gap-2 flex items-center justify-center text-white text-lg font-text tracking-tighter bg-red-600'>
+                  <IoExit className='w-8 rotate-180 h-full text-white'/>
+                  <p>Sign Out</p>
+                </div>
+                <div className='w-1/2 gap-2 h-full rounded-xl flex items-center justify-center text-white text-lg font-text tracking-tighter bg-blue-600'>
+                  <p>Profile</p>
+                  <IoExit className='w-8 h-full text-white'/>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {activeDetails && (
           <div onMouseEnter={()=>setisdetailActive(true)} onMouseLeave={()=>setisdetailActive(false)} className='w-full font-main relative min-h-[20vh] gap-20 flex items-center justify-center bg-white'>
             <div className='flex flex-col gap-2 p-5 text-center'>

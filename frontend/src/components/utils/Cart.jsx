@@ -5,20 +5,41 @@ import { useNavigate } from 'react-router-dom';
 import {loadStripe} from '@stripe/stripe-js';
 
 const Cart = ({ setCart }) => {
-  const { items } = useSelector(state => state.cart);
-  const [total, setTotal] = useState(0);
+  const { items,userRef,total } = useSelector(state => state.cart);
   const navigate = useNavigate()
-  useEffect(() => {
-    const calculateTotal = () => {
-      const newTotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-      setTotal(newTotal);
-    };
 
-    calculateTotal();
-  }, [items]);
+  const handleCheckout = async() => {
+    const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+    const body = {
+      products: items,
+      total:total
+    }
+    const headers = {
+      "Content-Type":"application/json"
+    }
+
+    const res = await fetch(`/api/v1/payment/checkout/${userRef}`,{
+      method:"POST",
+      headers:headers,
+      body: JSON.stringify(body)
+    })
+
+    const session = await res.json();
+
+    const result = stripe.redirectToCheckout({
+      sessionId: session.id
+    })
+
+    if(result.error){
+      console.log(result.error);
+      return;
+    }
+
+
+  }
 
   return (
-    <div className="w-[20%] h-full z-50 fixed top-10 right-10 flex items-center justify-center">
+    <div className="w-[20%] h-full z-20 fixed top-10 right-10 flex items-center justify-center">
       <div className="w-full h-[80%] flex flex-col bg-white rounded-xl shadow-xl relative">
         <IoClose onClick={() => {setCart(false)}} className="w-12 h-12 absolute z-50 top-5 right-5 text-red-500 cursor-pointer" />
         <p className="text-3xl font-main w-full text-center mt-16 pb-3">Your Cart</p>
@@ -57,7 +78,7 @@ const Cart = ({ setCart }) => {
         </div>
         <div className="w-full flex flex-col gap-2 py-3 bg-white border-t border-gray-300">
           <p className="text-3xl font-main w-full text-center">Total: ${total.toFixed(2)}</p>
-          <button className="w-full bg-black text-white font-main text-3xl py-2">Check Out</button>
+          <button onClick={handleCheckout} className="w-full bg-black text-white font-main text-3xl py-2">Check Out</button>
         </div>
       </div>
     </div>

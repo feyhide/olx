@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     userRef: "",
-    items: []
+    items: [],
+    total:0,
 };
 
 const cartSlice = createSlice({
@@ -16,7 +17,6 @@ const cartSlice = createSlice({
             const { product, quantity, size } = action.payload;
             const quantityInt = parseInt(quantity, 10);
 
-            // Check if a product with the same size is already in the cart
             const existingProduct = state.items.find(item => 
                 item.product._id === product._id && item.selectedSize._id === size._id
             );
@@ -30,6 +30,9 @@ const cartSlice = createSlice({
                     selectedSize: size
                 });
             }
+
+            const _total = state.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+            state.total = _total
         },
         removeProductFromCart: (state, action) => {
             const { productId } = action.payload;
@@ -38,6 +41,7 @@ const cartSlice = createSlice({
         reset: (state) => {
             state.userRef = initialState.userRef;
             state.items = initialState.items;
+            state.total = initialState.total
         }
     }
 });

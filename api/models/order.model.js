@@ -14,6 +14,16 @@ const OrderSchema = new mongoose.Schema({
             default: 1,
             min: 1 
         },
+        selectedSize:{
+            country:{
+                type:String,
+                required:true
+            },
+            size:{
+                type: Number,
+                required:true
+            }
+        }
     }],
     trackingId:{
         type:String
@@ -23,7 +33,7 @@ const OrderSchema = new mongoose.Schema({
         enum: ["pending","dispatch","in process","delivered"],
         default: "pending"
     },
-    totalPrice:{
+    total:{
         type:Number,
         required:true
     }
