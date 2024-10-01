@@ -57,3 +57,24 @@ export const signOut = async (req,res,next) => {
         next(error)
     }
 }
+
+export const checkAdmin = async (req, res, next) => {
+    const {id} = req.body;
+    try {
+        const user = await User.findOne({id});
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+        
+        if(user.admin){
+            return res.status(200).json({
+                message:true
+            })
+        }
+
+        return next(errorHandler(400,false))
+        
+    } catch (error) {
+        next(error);
+    }
+};

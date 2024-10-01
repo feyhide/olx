@@ -1,10 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useNavigate } from 'react-router-dom'
 
 const AdminRoute = () => {
     const {currentUser} = useSelector((state)=> state.user)
-    return currentUser && currentUser.email === "superadmin@admin.com" ? <Outlet/> : <Navigate to='/'/>
+    const navigate = useNavigate()
+    useEffect(()=>{
+        const checkIsAdmin = async() => {
+            try {
+                const res = await fetch('/api/v1/auth/checkadmin')
+                const data = await res.json()
+                if(data.message === true){
+                    return true
+                }else{
+                    return false
+                }
+            } catch (error) {
+                console.log(error)
+                return false
+                navigate("/")
+            }
+        }
+    },[])
+    return confirmed ? <Outlet/> : <Navigate to='/'/>
 }
 
 export default AdminRoute
